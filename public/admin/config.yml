@@ -1,8 +1,11 @@
 backend:
   name: github
   repo: music-sustech/music-sustech.github.io
-  branch: main
-  base_url: https://music-lab-oauth.deno.dev   # Deno Deploy OAuth broker (placeholder)
+  # During preview/Phase-4-validation, edits commit to the astro-rebuild branch
+  # so they don't land on `main` (still serving legacy Jekyll). Flip to `main`
+  # during cutover, after main is switched to GitHub Actions deploys.
+  branch: astro-rebuild
+  base_url: https://music-lab-oauth.deno.dev
   auth_endpoint: /auth
 
 publish_mode: editorial_workflow
