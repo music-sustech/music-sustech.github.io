@@ -50,16 +50,16 @@ function isActive(href: string): boolean {
 ---
 
 <header class="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-sm">
-  <nav class="mx-auto flex max-w-5xl items-end justify-between px-4 py-3">
+  <nav class="mx-auto flex max-w-5xl items-baseline justify-between px-4 py-3">
     <!-- Wordmark (home link) -->
     <a href={url('/')} class="group flex flex-col leading-tight no-underline hover:no-underline">
       <span class="text-[36px] font-semibold tracking-tight text-ink">MUSIC Lab @ SUSTech</span>
       <span class="text-[14px] text-muted">Microsystems for Ubiquitous Sensing, Intelligence, and Communication</span>
     </a>
 
-    <!-- Desktop nav — leading-tight matches the wordmark's leading-tight so
-         the visual text bottoms line up (items-end aligns box bottoms). -->
-    <ul class="hidden items-end gap-6 leading-tight lg:flex">
+    <!-- Desktop nav — outer <nav> uses items-baseline so these items'
+         baseline aligns with the wordmark's first-line (MUSIC Lab) baseline. -->
+    <ul class="hidden items-center gap-6 lg:flex">
       {navItems.map((item) => (
         <li class="relative group/nav">
           {item.children ? (
