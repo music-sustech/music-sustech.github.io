@@ -1,5 +1,6 @@
 ---
 import { url } from '../lib/url';
+import Search from './Search.astro';
 
 const currentPath = Astro.url.pathname;
 
@@ -106,6 +107,9 @@ function isActive(href: string): boolean {
           )}
         </li>
       ))}
+      <li class="relative">
+        <Search />
+      </li>
     </ul>
 
     <!-- Mobile hamburger button -->
