@@ -57,8 +57,9 @@ function isActive(href: string): boolean {
       <span class="text-[14px] text-muted">Microsystems for Ubiquitous Sensing, Intelligence, and Communication</span>
     </a>
 
-    <!-- Desktop nav — leading-none so menu-item visual bottoms bottom-align with the wordmark -->
-    <ul class="hidden items-end gap-6 leading-none lg:flex">
+    <!-- Desktop nav — leading-tight matches the wordmark's leading-tight so
+         the visual text bottoms line up (items-end aligns box bottoms). -->
+    <ul class="hidden items-end gap-6 leading-tight lg:flex">
       {navItems.map((item) => (
         <li class="relative group/nav">
           {item.children ? (
