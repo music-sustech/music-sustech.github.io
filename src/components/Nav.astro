@@ -1,0 +1,193 @@
+---
+const currentPath = Astro.url.pathname;
+
+interface NavItem {
+  label: string;
+  href: string;
+  children?: { label: string; href: string }[];
+}
+
+const navItems: NavItem[] = [
+  { label: 'Teaching', href: '/teaching' },
+  {
+    label: 'Research',
+    href: '/research',
+    children: [
+      { label: 'Research Directions', href: '/research' },
+      { label: 'Publications', href: '/research/publications' },
+      { label: 'Facilities', href: '/research/facilities' },
+    ],
+  },
+  { label: 'People', href: '/people' },
+  {
+    label: 'Updates',
+    href: '/updates/news',
+    children: [
+      { label: 'News', href: '/updates/news' },
+      { label: 'Blog', href: '/updates/blog' },
+    ],
+  },
+  { label: 'Join Us', href: '/join' },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
+---
+
+<header class="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-sm">
+  <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+    <!-- Wordmark (home link) -->
+    <a href="/" class="group flex flex-col leading-tight no-underline hover:no-underline">
+      <span class="text-[36px] font-semibold tracking-tight text-ink">MUSIC Lab @ SUSTech</span>
+      <span class="text-[14px] text-muted">Microsystems for Ubiquitous Sensing, Intelligence, and Communication</span>
+    </a>
+
+    <!-- Desktop nav -->
+    <ul class="hidden items-center gap-6 lg:flex">
+      {navItems.map((item) => (
+        <li class="relative group/nav">
+          {item.children ? (
+            <>
+              <button
+                class:list={[
+                  'flex items-center gap-1 text-[18px] font-medium transition-colors hover:text-accent',
+                  isActive(item.href) ? 'text-accent border-b-2 border-accent pb-0.5' : 'text-ink',
+                ]}
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                {item.label}
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <ul class="invisible absolute left-0 top-full mt-1 min-w-[200px] rounded-md border border-line bg-paper py-1 opacity-0 shadow-lg transition-all group-hover/nav:visible group-hover/nav:opacity-100">
+                {item.children.map((child) => (
+                  <li>
+                    <a
+                      href={child.href}
+                      class:list={[
+                        'block px-4 py-2 text-sm transition-colors hover:bg-accent-soft hover:text-accent',
+                        isActive(child.href) ? 'text-accent font-medium' : 'text-ink',
+                      ]}
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <a
+              href={item.href}
+              class:list={[
+                'text-[18px] font-medium transition-colors hover:text-accent',
+                isActive(item.href) ? 'text-accent border-b-2 border-accent pb-0.5' : 'text-ink',
+              ]}
+            >
+              {item.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+
+    <!-- Mobile hamburger button -->
+    <button
+      id="mobile-menu-btn"
+      class="lg:hidden p-2 text-ink"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+    >
+      <svg id="hamburger-icon" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="close-icon" class="hidden h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile nav menu -->
+  <div id="mobile-menu" class="hidden border-t border-line lg:hidden">
+    <ul class="px-4 py-2">
+      {navItems.map((item) => (
+        <li class="border-b border-line last:border-b-0">
+          {item.children ? (
+            <div class="mobile-dropdown">
+              <button
+                class:list={[
+                  'flex w-full items-center justify-between py-3 text-[16px] font-medium',
+                  isActive(item.href) ? 'text-accent' : 'text-ink',
+                ]}
+                aria-expanded="false"
+              >
+                {item.label}
+                <svg class="mobile-chevron h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <ul class="mobile-submenu hidden pb-2 pl-4">
+                {item.children.map((child) => (
+                  <li>
+                    <a
+                      href={child.href}
+                      class:list={[
+                        'block py-2 text-sm transition-colors hover:text-accent',
+                        isActive(child.href) ? 'text-accent font-medium' : 'text-muted',
+                      ]}
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a
+              href={item.href}
+              class:list={[
+                'block py-3 text-[16px] font-medium transition-colors hover:text-accent',
+                isActive(item.href) ? 'text-accent' : 'text-ink',
+              ]}
+            >
+              {item.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script is:inline>
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  if (menuBtn && mobileMenu && hamburgerIcon && closeIcon) {
+    menuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('hidden');
+      hamburgerIcon.classList.toggle('hidden', !isOpen);
+      closeIcon.classList.toggle('hidden', isOpen);
+      menuBtn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  }
+
+  // Mobile accordion dropdowns
+  document.querySelectorAll('.mobile-dropdown button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const submenu = btn.nextElementSibling;
+      const chevron = btn.querySelector('.mobile-chevron');
+      if (submenu && chevron) {
+        const isHidden = submenu.classList.toggle('hidden');
+        chevron.style.transform = isHidden ? '' : 'rotate(180deg)';
+        btn.setAttribute('aria-expanded', String(!isHidden));
+      }
+    });
+  });
+</script>

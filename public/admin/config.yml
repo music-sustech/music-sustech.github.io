@@ -1,0 +1,201 @@
+backend:
+  name: github
+  repo: music-sustech/music-sustech.github.io
+  branch: main
+  base_url: https://music-lab-oauth.deno.dev   # Deno Deploy OAuth broker (placeholder)
+  auth_endpoint: /auth
+
+publish_mode: editorial_workflow
+
+media_folder: src/assets
+public_folder: /src/assets
+
+# --------------------------------------------------------------------------
+#  Collections
+# --------------------------------------------------------------------------
+
+collections:
+
+  # ── Publications ────────────────────────────────────────────────────────
+  - name: publications
+    label: Publications
+    folder: src/content/publications
+    create: true
+    slug: "{{fields.bibKey}}"
+    identifier_field: bibKey
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { name: bibKey, label: BibTeX Key, widget: string,
+          hint: "Auto-generated from first author + year + letter (e.g. byu2014a). Edit only if needed." }
+      - { name: title, label: Title, widget: string }
+      - name: authors
+        label: Authors
+        widget: list
+        field: { name: author, label: Author, widget: string }
+        min: 1
+      - { name: year, label: Year, widget: number, value_type: int, min: 2000, max: 2100 }
+      - name: venueType
+        label: Venue Type
+        widget: select
+        options:
+          - { label: Journal, value: journal }
+          - { label: Conference, value: conference }
+          - { label: Workshop, value: workshop }
+          - { label: Preprint, value: preprint }
+          - { label: Thesis, value: thesis }
+          - { label: Patent, value: patent }
+      - { name: venue, label: Venue, widget: string, required: false }
+      - { name: doi, label: DOI, widget: string, required: false,
+          hint: "e.g. 10.1109/TMTT.2024.1234567" }
+      - { name: pdf, label: PDF URL, widget: string, required: false,
+          hint: "R2 URL, e.g. https://pub-6526459aa6b442a7b070a1f0578eb4eb.r2.dev/papers/byu2014a.pdf" }
+      - { name: arxiv, label: arXiv ID, widget: string, required: false,
+          hint: "e.g. 2401.12345" }
+      - { name: abstract, label: Abstract, widget: text, required: false }
+      - { name: bibtex, label: BibTeX, widget: text, required: false,
+          hint: "Full BibTeX entry — auto-populated when using the BibTeX parser." }
+      - { name: note, label: Note, widget: string, required: false,
+          hint: "e.g. Best Paper Award" }
+      - { name: sortKey, label: Sort Key, widget: string, required: false,
+          hint: "YYYYMM for ordering within a year, e.g. 202403" }
+      - { name: patent, label: Patent Number, widget: string, required: false }
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        field: { name: tag, label: Tag, widget: string }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: thumbnail, label: Thumbnail, widget: image, required: false }
+      - { name: body, label: Body, widget: markdown, required: false }
+
+  # ── People ──────────────────────────────────────────────────────────────
+  - name: people
+    label: People
+    folder: src/content/people
+    create: true
+    slug: "{{name | slugify}}"
+    identifier_field: name
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { name: name, label: Name, widget: string }
+      - name: role
+        label: Role
+        widget: select
+        options:
+          - { label: PI, value: pi }
+          - { label: Postdoc, value: postdoc }
+          - { label: PhD Student, value: phd }
+          - { label: Master's Student, value: masters }
+          - { label: Undergraduate, value: undergrad }
+          - { label: Visiting Scholar, value: visiting }
+          - { label: Staff, value: staff }
+      - name: status
+        label: Status
+        widget: select
+        options:
+          - { label: Current, value: current }
+          - { label: Alumni, value: alumni }
+      - { name: photo, label: Photo, widget: image, required: false }
+      - { name: email, label: Email, widget: string, required: false }
+      - { name: showEmail, label: Show Email Publicly, widget: boolean, default: false }
+      - { name: scholar, label: Google Scholar URL, widget: string, required: false }
+      - { name: github, label: GitHub Username, widget: string, required: false }
+      - { name: linkedin, label: LinkedIn URL, widget: string, required: false }
+      - { name: joined, label: Joined (YYYY-MM), widget: string }
+      - { name: left, label: Left (YYYY-MM), widget: string, required: false }
+      - { name: currentPosition, label: Current Position (for alumni), widget: string, required: false }
+      - { name: bio, label: Bio, widget: text, required: false }
+      - { name: body, label: Body, widget: markdown, required: false }
+
+  # ── News ────────────────────────────────────────────────────────────────
+  - name: news
+    label: News
+    folder: src/content/news
+    create: true
+    slug: "{{title | slugify}}"
+    identifier_field: title
+    extension: md
+    format: yaml-frontmatter
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: datetime }
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        field: { name: tag, label: Tag, widget: string }
+      - { name: pinned, label: Pinned, widget: boolean, default: false }
+      - { name: body, label: Body, widget: markdown }
+
+  # ── Blog ────────────────────────────────────────────────────────────────
+  - name: blog
+    label: Blog
+    folder: src/content/blog
+    create: true
+    slug: "{{title | slugify}}"
+    identifier_field: title
+    extension: md
+    format: yaml-frontmatter
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: datetime }
+      - name: author
+        label: Author
+        widget: relation
+        collection: people
+        search_fields: [name]
+        value_field: "{{slug}}"
+        display_fields: [name]
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        field: { name: tag, label: Tag, widget: string }
+      - { name: excerpt, label: Excerpt, widget: text, required: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Body, widget: markdown }
+
+  # ── Research ────────────────────────────────────────────────────────────
+  - name: research
+    label: Research
+    folder: src/content/research
+    create: true
+    slug: "{{title | slugify}}"
+    identifier_field: title
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: order, label: Display Order, widget: number, value_type: int, default: 100 }
+      - { name: shortDescription, label: Short Description, widget: text }
+      - { name: hero, label: Hero Image, widget: image, required: false }
+      - { name: body, label: Body, widget: markdown }
+
+  # ── Teaching ────────────────────────────────────────────────────────────
+  - name: teaching
+    label: Teaching
+    folder: src/content/teaching
+    create: true
+    slug: "{{fields.courseCode | slugify}}"
+    identifier_field: courseCode
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { name: title, label: Course Title, widget: string }
+      - { name: courseCode, label: Course Code, widget: string, hint: "e.g. SME202" }
+      - { name: description, label: Description, widget: text }
+      - { name: currentlyOffered, label: Currently Offered, widget: boolean, default: false }
+      - name: offerings
+        label: Offerings
+        widget: list
+        required: false
+        fields:
+          - { name: semester, label: Semester, widget: string, hint: "e.g. Fall, Spring" }
+          - { name: year, label: Year, widget: number, value_type: int }
+          - { name: syllabusUrl, label: Syllabus URL, widget: string, required: false }
+          - { name: notes, label: Notes, widget: string, required: false }
+      - { name: body, label: Body, widget: markdown, required: false }

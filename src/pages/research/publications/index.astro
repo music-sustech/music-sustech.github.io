@@ -1,0 +1,56 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allPubs = await getCollection('publications');
+const sorted = allPubs.sort((a, b) => b.data.year - a.data.year);
+
+// Group by year
+const byYear = new Map<number, typeof sorted>();
+for (const pub of sorted) {
+  const yearGroup = byYear.get(pub.data.year) ?? [];
+  yearGroup.push(pub);
+  byYear.set(pub.data.year, yearGroup);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<Base title="Publications" description="All MUSIC Lab publications, grouped by year.">
+  <h1 class="mb-8 text-3xl font-semibold text-ink">Publications</h1>
+
+  {years.map((year) => (
+    <section class="mb-10">
+      <h2 class="mb-4 text-xl font-semibold text-ink">{year}</h2>
+      <ul class="space-y-5">
+        {byYear.get(year)!.map((pub) => (
+          <li class:list={['border-l-2 pl-4', pub.data.featured ? 'border-accent' : 'border-line']}>
+            <div class="mb-1 flex items-center gap-2">
+              <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">
+                {pub.data.year}
+              </span>
+              <span class="text-xs text-muted">{pub.data.venueType}</span>
+            </div>
+            <a href={`/research/publications/${pub.id}`} class="text-base font-medium leading-snug text-ink hover:text-accent">
+              {pub.data.title}
+            </a>
+            <p class="mt-1 text-sm text-muted">
+              {pub.data.authors.join(', ')}
+            </p>
+            <p class="text-sm text-muted italic">{pub.data.venue}</p>
+            <div class="mt-2 flex gap-3 text-xs">
+              {pub.data.pdf && (
+                <a href={pub.data.pdf} class="text-accent hover:underline">PDF</a>
+              )}
+              {pub.data.doi && (
+                <a href={`https://doi.org/${pub.data.doi}`} class="text-accent hover:underline">DOI</a>
+              )}
+              {pub.data.bibtex && (
+                <span class="text-accent cursor-pointer hover:underline">BibTeX</span>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>

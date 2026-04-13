@@ -1,0 +1,32 @@
+---
+bibKey: "ywang2017a"
+title: "Millimeter-wave Imaging of Magnetic Fusion Plasmas, Technology Innovations Advancing Physics Understanding"
+authors:
+  - "Y. Wang"
+  - "B. Tobias"
+  - "Y.-T. Chang"
+  - "J.-H. Yu"
+  - "M. Li"
+  - "F. Hu"
+  - "M. Chen"
+  - "M. Mamidanna"
+  - "T. Phan"
+  - "A.-V. Pham"
+  - "J. Gu"
+  - "X. Liu"
+  - "Y. Zhu"
+  - "C.W. Domier"
+  - "L. Shi"
+  - "E. Valeo"
+  - "G.J. Kramer"
+  - "D. Kuwahara"
+  - "Y. Nagayama"
+  - "A. Mase"
+  - "N.C. Luhmann Jr."
+year: 2017
+venueType: journal
+venue: "Nuclear Fusion"
+doi: "10.1088/1741-4326/aa5e30"
+pdf: "https://pub-6526459aa6b442a7b070a1f0578eb4eb.r2.dev/papers/ywang2017a.pdf"
+sortKey: "201703"
+---

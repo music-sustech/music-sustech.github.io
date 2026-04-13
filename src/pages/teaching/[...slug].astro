@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const courses = await getCollection('teaching');
+  return courses.map((course) => ({
+    params: { slug: course.id },
+    props: { course },
+  }));
+}
+
+const { course } = Astro.props;
+const { Content } = await render(course);
+---
+
+<Base title={`${course.data.courseCode} — ${course.data.title}`}>
+  <p class="mb-4">
+    <a href="/teaching" class="text-sm text-accent hover:underline">&larr; All courses</a>
+  </p>
+
+  <div class="mb-2 flex items-baseline gap-3">
+    <span class="rounded bg-accent-soft px-2 py-0.5 text-sm font-medium text-accent">
+      {course.data.courseCode}
+    </span>
+    {course.data.currentlyOffered ? (
+      <span class="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+        Currently offered
+      </span>
+    ) : (
+      <span class="text-xs text-muted">Past course</span>
+    )}
+  </div>
+
+  <h1 class="mb-4 text-3xl font-semibold text-ink">{course.data.title}</h1>
+  <p class="mb-8 text-muted">{course.data.description}</p>
+
+  {course.data.offerings.length > 0 && (
+    <div class="mb-8">
+      <h2 class="mb-3 text-lg font-semibold text-ink">Offerings</h2>
+      <div class="flex flex-wrap gap-2">
+        {course.data.offerings.map((o) => (
+          <span class="rounded border border-line px-3 py-1 text-sm text-muted">
+            {o.semester} {o.year}
+          </span>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div class="prose prose-ink max-w-none">
+    <Content />
+  </div>
+</Base>

@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const research = await getCollection('research');
+  return research.map((area) => ({
+    params: { slug: area.id },
+    props: { area },
+  }));
+}
+
+const { area } = Astro.props;
+const { Content } = await render(area);
+const d = area.data;
+---
+
+<Base title={d.title} description={d.shortDescription}>
+  <!-- Back link -->
+  <nav class="mb-6">
+    <a href="/research" class="text-sm text-accent hover:underline">&larr; All research directions</a>
+  </nav>
+
+  <h1 class="mb-6 text-3xl font-semibold leading-tight text-ink">{d.title}</h1>
+
+  {d.hero && (
+    <img
+      src={d.hero.src}
+      alt={d.title}
+      class="mb-8 w-full rounded-lg border border-line object-cover"
+    />
+  )}
+
+  <article class="prose">
+    <Content />
+  </article>
+</Base>

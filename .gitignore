@@ -1,0 +1,40 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# Legacy Jekyll repo (cloned locally only as a migration source)
+legacy/
+
+# CV source — will live in its own repo if we host it on GitHub
+references/cv*/
+
+# Working notes from the Phase 1 audit (keep local, not part of the site repo)
+phase1/
+
+# Claude Code local state (scheduled tasks, session settings)
+.claude/
+
+# Superpowers skill artifacts (local planning/brainstorm scratch)
+.superpowers/
+docs/superpowers/

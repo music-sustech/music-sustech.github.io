@@ -1,0 +1,94 @@
+name: Preview Deploy
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+# Only one preview build at a time per branch
+concurrency:
+  group: preview-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-preview:
+    runs-on: ubuntu-latest
+    # Skip if this is a PR from a fork (no access to secrets)
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Astro site
+        run: pnpm build
+
+      - name: Run Pagefind
+        run: pnpm dlx pagefind --site dist
+
+      - name: Deploy to preview repo
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          # A deploy key or PAT with push access to the preview repo.
+          # Store as a repository secret named PREVIEW_DEPLOY_KEY.
+          deploy_key: ${{ secrets.PREVIEW_DEPLOY_KEY }}
+          external_repository: music-sustech/music-sustech-preview.github.io
+          publish_branch: main
+          publish_dir: ./dist
+          force_orphan: true  # Last-push-wins: force-push a single orphan commit
+
+      - name: Post preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = '🔗 **Preview deployed:** https://music-sustech.github.io (preview repo)\n\n' +
+              '_Last push wins — this preview reflects the most recently pushed branch._';
+            // Check if we already left a comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Preview deployed')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

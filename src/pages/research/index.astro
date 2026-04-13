@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allResearch = await getCollection('research');
+const sorted = allResearch.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base title="Research Directions" description="Research areas of the MUSIC Lab.">
+  <h1 class="mb-8 text-3xl font-semibold text-ink">Research Directions</h1>
+
+  {sorted.length === 0 ? (
+    <p class="text-muted">Research directions are being updated. Check back soon.</p>
+  ) : (
+    <div class="grid gap-6 sm:grid-cols-2">
+      {sorted.map((area) => (
+        <a
+          href={`/research/${area.id}`}
+          class="group rounded-lg border border-line p-6 transition-colors hover:border-accent hover:no-underline"
+        >
+          {area.data.hero && (
+            <img
+              src={area.data.hero.src}
+              alt={area.data.title}
+              class="mb-4 h-40 w-full rounded object-cover"
+            />
+          )}
+          <h2 class="text-lg font-semibold text-ink group-hover:text-accent">{area.data.title}</h2>
+          <p class="mt-2 text-sm text-muted">{area.data.shortDescription}</p>
+        </a>
+      ))}
+    </div>
+  )}
+</Base>

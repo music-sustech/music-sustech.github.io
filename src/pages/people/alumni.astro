@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allPeople = await getCollection('people');
+const alumni = allPeople.filter((p) => p.data.status === 'alumni');
+
+const roleLabels: Record<string, string> = {
+  pi: 'PI',
+  postdoc: 'Postdoc',
+  phd: 'PhD',
+  masters: 'Masters',
+  undergrad: 'Undergrad',
+  visiting: 'Visiting Scholar',
+  staff: 'Staff',
+};
+
+// Group by year departed (left field), descending
+const byYear = new Map<string, typeof alumni>();
+for (const person of alumni) {
+  const year = person.data.left ?? 'Unknown';
+  const group = byYear.get(year) ?? [];
+  group.push(person);
+  byYear.set(year, group);
+}
+const years = [...byYear.keys()].sort((a, b) => {
+  if (a === 'Unknown') return 1;
+  if (b === 'Unknown') return -1;
+  return b.localeCompare(a);
+});
+---
+
+<Base title="Alumni" description="Alumni of the MUSIC Lab.">
+  <!-- Back link -->
+  <nav class="mb-6">
+    <a href="/people" class="text-sm text-accent hover:underline">&larr; Current members</a>
+  </nav>
+
+  <h1 class="mb-8 text-3xl font-semibold text-ink">Alumni</h1>
+
+  {years.map((year) => {
+    const members = byYear.get(year)!;
+    return (
+      <section class="mb-8">
+        <h2 class="mb-3 text-lg font-semibold text-ink">{year}</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-line text-left text-muted">
+                <th class="pb-2 pr-4 font-medium">Name</th>
+                <th class="pb-2 pr-4 font-medium">Role</th>
+                <th class="pb-2 pr-4 font-medium">Years</th>
+                <th class="pb-2 font-medium">Current Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.map((person) => (
+                <tr class="border-b border-line last:border-b-0">
+                  <td class="py-2 pr-4">
+                    <a href={`/people/${person.id}`} class="text-accent hover:underline">
+                      {person.data.name}
+                    </a>
+                  </td>
+                  <td class="py-2 pr-4 text-muted">{roleLabels[person.data.role] ?? person.data.role}</td>
+                  <td class="py-2 pr-4 text-muted">{person.data.joined}–{person.data.left ?? ''}</td>
+                  <td class="py-2 text-muted">{person.data.currentPosition ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    );
+  })}
+</Base>

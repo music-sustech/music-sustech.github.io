@@ -1,0 +1,157 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pubs = await getCollection('publications');
+  return pubs.map((pub) => ({
+    params: { slug: pub.id },
+    props: { pub },
+  }));
+}
+
+const { pub } = Astro.props;
+const { Content } = await render(pub);
+const d = pub.data;
+
+// Venue type labels
+const venueTypeLabels: Record<string, string> = {
+  journal: 'Journal',
+  conference: 'Conference',
+  workshop: 'Workshop',
+  preprint: 'Preprint',
+  thesis: 'Thesis',
+  patent: 'Patent',
+};
+
+// Auto-generate BibTeX from frontmatter
+function generateBibtex(): string {
+  if (d.bibtex) return d.bibtex;
+
+  const entryType = d.venueType === 'journal' ? 'article' : d.venueType === 'thesis' ? 'phdthesis' : d.venueType === 'patent' ? 'misc' : 'inproceedings';
+  const authors = d.authors.join(' and ');
+  const lines: string[] = [];
+  lines.push(`@${entryType}{${d.bibKey},`);
+  lines.push(`  author    = {${authors}},`);
+  lines.push(`  title     = {${d.title}},`);
+  if (d.venue) {
+    if (entryType === 'article') {
+      lines.push(`  journal   = {${d.venue}},`);
+    } else if (entryType === 'inproceedings') {
+      lines.push(`  booktitle = {${d.venue}},`);
+    } else {
+      lines.push(`  note      = {${d.venue}},`);
+    }
+  }
+  lines.push(`  year      = {${d.year}},`);
+  if (d.doi) lines.push(`  doi       = {${d.doi}},`);
+  lines.push('}');
+  return lines.join('\n');
+}
+
+const bibtex = generateBibtex();
+---
+
+<Base title={d.title} description={`${d.authors.join(', ')} (${d.year}). ${d.venue ?? ''}`}>
+  <!-- Back link -->
+  <nav class="mb-6">
+    <a href="/research/publications" class="text-sm text-accent hover:underline">&larr; All publications</a>
+  </nav>
+
+  <!-- Title -->
+  <h1 class="mb-3 text-2xl font-semibold leading-tight text-ink">{d.title}</h1>
+
+  <!-- Authors -->
+  <p class="mb-2 text-base text-muted">{d.authors.join(', ')}</p>
+
+  <!-- Year, venue, venue type badge -->
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">{d.year}</span>
+    <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">{venueTypeLabels[d.venueType] ?? d.venueType}</span>
+    {d.venue && <span class="text-sm italic text-muted">{d.venue}</span>}
+  </div>
+
+  <!-- Note (e.g. "Best Conference Paper") -->
+  {d.note && (
+    <div class="mb-6 rounded border border-accent bg-accent-soft px-4 py-2 text-sm font-medium text-accent">
+      {d.note}
+    </div>
+  )}
+
+  <!-- Links -->
+  <div class="mb-8 flex flex-wrap gap-3">
+    {d.doi && (
+      <a href={`https://doi.org/${d.doi}`} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+        DOI
+      </a>
+    )}
+    {d.pdf && (
+      <a href={d.pdf} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+        PDF
+      </a>
+    )}
+    {d.arxiv && (
+      <a href={`https://arxiv.org/abs/${d.arxiv}`} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+        arXiv
+      </a>
+    )}
+    {d.patent && (
+      <a href={d.patent} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+        Patent
+      </a>
+    )}
+  </div>
+
+  <!-- Tags -->
+  {d.tags.length > 0 && (
+    <div class="mb-8 flex flex-wrap gap-2">
+      {d.tags.map((tag: string) => (
+        <span class="rounded bg-accent-soft px-2 py-0.5 text-xs text-accent">{tag}</span>
+      ))}
+    </div>
+  )}
+
+  <!-- Abstract -->
+  {d.abstract && (
+    <section class="mb-8">
+      <h2 class="mb-2 text-lg font-semibold text-ink">Abstract</h2>
+      <p class="text-sm leading-relaxed text-muted">{d.abstract}</p>
+    </section>
+  )}
+
+  <!-- Body content (rendered markdown) if any -->
+  {pub.body && pub.body.trim().length > 0 && (
+    <section class="prose mb-8">
+      <Content />
+    </section>
+  )}
+
+  <!-- BibTeX -->
+  <section class="mb-8">
+    <div class="mb-2 flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-ink">BibTeX</h2>
+      <button
+        id="copy-bibtex"
+        class="rounded border border-line px-3 py-1 text-xs font-medium text-muted transition-colors hover:bg-accent-soft hover:text-accent"
+      >
+        Copy
+      </button>
+    </div>
+    <pre id="bibtex-block" class="overflow-x-auto rounded bg-accent-soft p-4 text-sm leading-relaxed">{bibtex}</pre>
+  </section>
+
+  <script is:inline>
+    (function () {
+      const btn = document.getElementById('copy-bibtex');
+      const block = document.getElementById('bibtex-block');
+      if (btn && block) {
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(block.textContent || '').then(() => {
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+          });
+        });
+      }
+    })();
+  </script>
+</Base>

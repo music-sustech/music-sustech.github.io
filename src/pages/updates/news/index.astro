@@ -1,0 +1,41 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allNews = await getCollection('news');
+const sorted = allNews.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Pinned items first, then the rest
+const pinned = sorted.filter((n) => n.data.pinned);
+const unpinned = sorted.filter((n) => !n.data.pinned);
+const ordered = [...pinned, ...unpinned];
+---
+
+<Base title="News" description="Announcements and updates from the MUSIC Lab.">
+  <h1 class="mb-8 text-3xl font-semibold text-ink">News</h1>
+
+  <ul class="space-y-8">
+    {ordered.map((item) => (
+      <li class="border-b border-line pb-6 last:border-b-0">
+        <div class="flex items-center gap-2">
+          <time class="text-sm text-muted" datetime={item.data.date.toISOString().slice(0, 10)}>
+            {item.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          {item.data.pinned && (
+            <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">Pinned</span>
+          )}
+        </div>
+        <a href={`/updates/news/${item.id}`} class="mt-1 block text-xl font-semibold text-ink hover:text-accent">
+          {item.data.title}
+        </a>
+        {item.data.tags.length > 0 && (
+          <div class="mt-2 flex flex-wrap gap-2">
+            {item.data.tags.map((tag: string) => (
+              <span class="rounded bg-accent-soft px-2 py-0.5 text-xs text-accent">{tag}</span>
+            ))}
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</Base>

@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MUSIC Lab CMS</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  BibTeX parser panel – sits above the CMS frame when on the        */
+    /*  publications collection page.                                      */
+    /* ------------------------------------------------------------------ */
+    #bibtex-panel {
+      display: none; /* shown by bibtex-parser.js when appropriate */
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      max-height: 100vh;
+      overflow-y: auto;
+      background: #f8fafc;
+      border-left: 1px solid #e2e8f0;
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      z-index: 10000;
+      font-size: 14px;
+    }
+
+    #bibtex-panel h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: #0b0f14;
+    }
+
+    #bibtex-panel textarea {
+      width: 100%;
+      height: 200px;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 12px;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      resize: vertical;
+    }
+
+    #bibtex-panel button {
+      margin-top: 10px;
+      padding: 8px 20px;
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #bibtex-panel button:hover {
+      background: #1e40af;
+    }
+
+    #bibtex-panel .toggle-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      color: #64748b;
+      padding: 4px 8px;
+      font-size: 18px;
+    }
+
+    #bibtex-panel .toggle-btn:hover {
+      color: #0b0f14;
+      background: transparent;
+    }
+
+    #bibtex-panel .status {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    #bibtex-panel .status.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    #bibtex-panel .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    /* Floating button to open the panel */
+    #bibtex-toggle {
+      display: none; /* shown by bibtex-parser.js when appropriate */
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10001;
+      padding: 10px 18px;
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #bibtex-toggle:hover {
+      background: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <!-- BibTeX parser floating panel -->
+  <button id="bibtex-toggle">Paste BibTeX</button>
+  <div id="bibtex-panel">
+    <button class="toggle-btn" id="bibtex-close" title="Close">&times;</button>
+    <h3>Import from BibTeX</h3>
+    <p style="color:#64748b;margin:0 0 10px;font-size:13px;">
+      Paste a BibTeX entry below and click <strong>Parse</strong> to
+      auto-populate the publication form fields.
+    </p>
+    <textarea id="bibtex-input" placeholder="@article{key,
+  title = {Example Title},
+  author = {Last, First and Last2, First2},
+  year = {2024},
+  journal = {IEEE Trans. ...},
+  doi = {10.1109/...},
+  abstract = {...}
+}"></textarea>
+    <button id="bibtex-parse">Parse &amp; Fill Fields</button>
+    <div id="bibtex-status"></div>
+  </div>
+
+  <!-- Sveltia CMS -->
+  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+  <!-- BibTeX parser logic -->
+  <script src="/admin/bibtex-parser.js" type="module"></script>
+</body>
+</html>

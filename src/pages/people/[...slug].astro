@@ -1,0 +1,105 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const people = await getCollection('people');
+  return people.map((person) => ({
+    params: { slug: person.id },
+    props: { person },
+  }));
+}
+
+const { person } = Astro.props;
+const { Content } = await render(person);
+const d = person.data;
+
+const roleLabels: Record<string, string> = {
+  pi: 'Principal Investigator',
+  postdoc: 'Postdoctoral Researcher',
+  phd: 'PhD Student',
+  masters: 'Masters Student',
+  undergrad: 'Undergraduate Student',
+  visiting: 'Visiting Scholar',
+  staff: 'Staff',
+};
+
+const statusLabel = d.status === 'current' ? 'Current Member' : 'Alumni';
+---
+
+<Base title={d.name} description={`${d.name} — ${roleLabels[d.role]} at MUSIC Lab`}>
+  <!-- Back link -->
+  <nav class="mb-6">
+    <a href="/people" class="text-sm text-accent hover:underline">&larr; All people</a>
+  </nav>
+
+  <div class="flex flex-col gap-8 sm:flex-row">
+    <!-- Photo -->
+    {d.photo && (
+      <div class="shrink-0">
+        <img
+          src={d.photo.src}
+          alt={d.name}
+          width="160"
+          height="160"
+          class="h-40 w-40 rounded-lg border border-line object-cover"
+        />
+      </div>
+    )}
+
+    <!-- Info -->
+    <div class="flex-1">
+      <h1 class="mb-1 text-2xl font-semibold text-ink">{d.name}</h1>
+      <p class="mb-1 text-base text-muted">{roleLabels[d.role]}</p>
+      <div class="mb-4 flex flex-wrap items-center gap-2">
+        <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">{statusLabel}</span>
+        <span class="text-sm text-muted">
+          Joined {d.joined}{d.left ? ` · Left ${d.left}` : ''}
+        </span>
+      </div>
+
+      <!-- Current position (alumni) -->
+      {d.currentPosition && (
+        <p class="mb-4 text-sm text-muted">
+          <span class="font-medium text-ink">Current position:</span> {d.currentPosition}
+        </p>
+      )}
+
+      <!-- Bio -->
+      {d.bio && (
+        <p class="mb-4 text-sm leading-relaxed text-muted">{d.bio}</p>
+      )}
+
+      <!-- Contact links -->
+      <div class="flex flex-wrap gap-3">
+        {d.showEmail && d.email && (
+          <a href={`mailto:${d.email}`} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+            Email
+          </a>
+        )}
+        {d.scholar && (
+          <a href={d.scholar} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+            Google Scholar
+          </a>
+        )}
+        {d.github && (
+          <a href={`https://github.com/${d.github}`} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+            GitHub
+          </a>
+        )}
+        {d.linkedin && (
+          <a href={d.linkedin} class="inline-flex items-center gap-1 rounded border border-line px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent-soft">
+            LinkedIn
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Body content (rendered markdown) if any -->
+  {person.body && person.body.trim().length > 0 && (
+    <section class="prose mt-8">
+      <Content />
+    </section>
+  )}
+</Base>

@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allCourses = await getCollection('teaching');
+const current = allCourses.filter((c) => c.data.currentlyOffered).sort((a, b) => a.data.courseCode.localeCompare(b.data.courseCode));
+const past = allCourses.filter((c) => !c.data.currentlyOffered).sort((a, b) => a.data.courseCode.localeCompare(b.data.courseCode));
+---
+
+<Base title="Teaching" description="Courses taught by Prof. Liu at SUSTech and UC Davis.">
+  <h1 class="mb-8 text-3xl font-semibold text-ink">Teaching</h1>
+
+  {current.length > 0 && (
+    <section class="mb-10">
+      <h2 class="mb-6 text-xl font-semibold text-ink">Current Courses</h2>
+      <div class="space-y-4">
+        {current.map((course) => (
+          <a href={`/teaching/${course.id}`} class="block rounded-lg border border-line p-5 transition-colors hover:border-accent">
+            <div class="flex items-baseline gap-3">
+              <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">
+                {course.data.courseCode}
+              </span>
+              <h3 class="text-lg font-semibold text-ink">{course.data.title}</h3>
+            </div>
+            <p class="mt-2 text-sm text-muted">{course.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {past.length > 0 && (
+    <section class="mb-10">
+      <h2 class="mb-6 text-xl font-semibold text-ink">Past Courses (UC Davis)</h2>
+      <div class="space-y-3">
+        {past.map((course) => (
+          <a href={`/teaching/${course.id}`} class="block rounded-lg border border-line p-4 transition-colors hover:border-accent">
+            <div class="flex items-baseline gap-3">
+              <span class="rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">
+                {course.data.courseCode}
+              </span>
+              <h3 class="font-medium text-ink">{course.data.title}</h3>
+            </div>
+            <p class="mt-1 text-sm text-muted">{course.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>

@@ -1,0 +1,41 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allBlog = await getCollection('blog');
+const published = allBlog
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Base title="Blog" description="Long-form posts from the MUSIC Lab.">
+  <h1 class="mb-8 text-3xl font-semibold text-ink">Blog</h1>
+
+  {published.length === 0 ? (
+    <p class="text-muted">No blog posts yet. Check back soon.</p>
+  ) : (
+    <ul class="space-y-8">
+      {published.map((post) => (
+        <li class="border-b border-line pb-6 last:border-b-0">
+          <time class="text-sm text-muted" datetime={post.data.date.toISOString().slice(0, 10)}>
+            {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          <a href={`/updates/blog/${post.id}`} class="mt-1 block text-xl font-semibold text-ink hover:text-accent">
+            {post.data.title}
+          </a>
+          <p class="mt-1 text-sm text-muted">by {post.data.author}</p>
+          {post.data.excerpt && (
+            <p class="mt-2 text-sm leading-relaxed text-muted">{post.data.excerpt}</p>
+          )}
+          {post.data.tags.length > 0 && (
+            <div class="mt-2 flex flex-wrap gap-2">
+              {post.data.tags.map((tag: string) => (
+                <span class="rounded bg-accent-soft px-2 py-0.5 text-xs text-accent">{tag}</span>
+              ))}
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>
