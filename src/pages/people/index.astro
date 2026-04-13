@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
@@ -64,6 +65,6 @@ for (const person of currentMembers) {
   })}
 
   <p class="mt-8 text-sm text-muted">
-    <a href="/people/alumni" class="text-accent hover:underline">View alumni &rarr;</a>
+    <a href={url('/people/alumni')} class="text-accent hover:underline">View alumni &rarr;</a>
   </p>
 </Base>

@@ -7,8 +7,14 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
+// Preview deploys live under a sub-path (the preview repo name) on the same
+// music-sustech.github.io host. Prod lives at the root. Pass BASE_PATH at
+// build time (see .github/workflows/preview.yml) to drive this.
+const base = process.env.BASE_PATH || '/';
+
 export default defineConfig({
   site: 'https://music-sustech.github.io',
+  base,
   output: 'static',
   vite: {
     plugins: [

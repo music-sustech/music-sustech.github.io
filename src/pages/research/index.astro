@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
@@ -15,7 +16,7 @@ const sorted = allResearch.sort((a, b) => a.data.order - b.data.order);
     <div class="grid gap-6 sm:grid-cols-2">
       {sorted.map((area) => (
         <a
-          href={`/research/${area.id}`}
+          href={url(`/research/${area.id}`)}
           class="group rounded-lg border border-line p-6 transition-colors hover:border-accent hover:no-underline"
         >
           {area.data.hero && (

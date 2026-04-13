@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import heroPhoto from '../assets/homepage-photo.jpg';
+import { url } from '../lib/url';
 
 const allPubs = await getCollection('publications');
 const recentPubs = allPubs
@@ -35,9 +36,9 @@ const recentNews = allNews
           Critical to our scientific research efforts is a pursuit of fundamental understanding
           of the engineering principles of high frequency electronics. A major mission of our
           work is to formulate and disseminate such understanding through university
-          <a href="/teaching" class="text-accent hover:underline">education</a>
+          <a href={url('/teaching')} class="text-accent hover:underline">education</a>
           as well as community
-          <a href="/outreach" class="text-accent hover:underline">outreach</a>.
+          <a href={url('/outreach')} class="text-accent hover:underline">outreach</a>.
         </p>
       </div>
       <div class="shrink-0 sm:w-2/5">
@@ -66,7 +67,7 @@ const recentNews = allNews
               </span>
               <span class="text-xs text-muted">{pub.data.venueType}</span>
             </div>
-            <a href={`/research/publications/${pub.id}`} class="text-base font-medium leading-snug text-ink hover:text-accent">
+            <a href={url(`/research/publications/${pub.id}`)} class="text-base font-medium leading-snug text-ink hover:text-accent">
               {pub.data.title}
             </a>
             <p class="mt-1 text-sm text-muted">
@@ -85,7 +86,7 @@ const recentNews = allNews
         ))}
       </ul>
       <p class="mt-6">
-        <a href="/research/publications" class="text-sm font-medium text-accent hover:underline">
+        <a href={url('/research/publications')} class="text-sm font-medium text-accent hover:underline">
           View all publications &rarr;
         </a>
       </p>
@@ -100,14 +101,14 @@ const recentNews = allNews
             <time class="text-xs text-muted" datetime={item.data.date.toISOString().slice(0, 10)}>
               {item.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
             </time>
-            <a href={`/updates/news/${item.id}`} class="mt-1 block font-medium text-ink hover:text-accent">
+            <a href={url(`/updates/news/${item.id}`)} class="mt-1 block font-medium text-ink hover:text-accent">
               {item.data.title}
             </a>
           </li>
         ))}
       </ul>
       <p class="mt-6">
-        <a href="/updates/news" class="text-sm font-medium text-accent hover:underline">
+        <a href={url('/updates/news')} class="text-sm font-medium text-accent hover:underline">
           All news &rarr;
         </a>
       </p>

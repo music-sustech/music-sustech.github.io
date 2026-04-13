@@ -1,4 +1,5 @@
 ---
+import { url } from '../../../lib/url';
 import Base from '../../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
@@ -20,7 +21,7 @@ const published = allBlog
           <time class="text-sm text-muted" datetime={post.data.date.toISOString().slice(0, 10)}>
             {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </time>
-          <a href={`/updates/blog/${post.id}`} class="mt-1 block text-xl font-semibold text-ink hover:text-accent">
+          <a href={url(`/updates/blog/${post.id}`)} class="mt-1 block text-xl font-semibold text-ink hover:text-accent">
             {post.data.title}
           </a>
           <p class="mt-1 text-sm text-muted">by {post.data.author}</p>

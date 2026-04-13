@@ -1,4 +1,6 @@
 ---
+import { url } from '../lib/url';
+
 const currentPath = Astro.url.pathname;
 
 interface NavItem {
@@ -38,15 +40,19 @@ const navItems: NavItem[] = [
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/') return currentPath === '/';
-  return currentPath.startsWith(href);
+  // Compare against the unprefixed path since currentPath already has base stripped
+  // in dev but included in prod — easiest is to normalize by stripping BASE_URL.
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const normalized = base && currentPath.startsWith(base) ? currentPath.slice(base.length) || '/' : currentPath;
+  if (href === '/') return normalized === '/';
+  return normalized.startsWith(href);
 }
 ---
 
 <header class="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-sm">
-  <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+  <nav class="mx-auto flex max-w-5xl items-end justify-between px-4 py-3">
     <!-- Wordmark (home link) -->
-    <a href="/" class="group flex flex-col leading-tight no-underline hover:no-underline">
+    <a href={url('/')} class="group flex flex-col leading-tight no-underline hover:no-underline">
       <span class="text-[36px] font-semibold tracking-tight text-ink">MUSIC Lab @ SUSTech</span>
       <span class="text-[14px] text-muted">Microsystems for Ubiquitous Sensing, Intelligence, and Communication</span>
     </a>
@@ -74,7 +80,7 @@ function isActive(href: string): boolean {
                 {item.children.map((child) => (
                   <li>
                     <a
-                      href={child.href}
+                      href={url(child.href)}
                       class:list={[
                         'block px-4 py-2 text-sm transition-colors hover:bg-accent-soft hover:text-accent',
                         isActive(child.href) ? 'text-accent font-medium' : 'text-ink',
@@ -88,7 +94,7 @@ function isActive(href: string): boolean {
             </>
           ) : (
             <a
-              href={item.href}
+              href={url(item.href)}
               class:list={[
                 'text-[18px] font-medium transition-colors hover:text-accent',
                 isActive(item.href) ? 'text-accent border-b-2 border-accent pb-0.5' : 'text-ink',
@@ -140,7 +146,7 @@ function isActive(href: string): boolean {
                 {item.children.map((child) => (
                   <li>
                     <a
-                      href={child.href}
+                      href={url(child.href)}
                       class:list={[
                         'block py-2 text-sm transition-colors hover:text-accent',
                         isActive(child.href) ? 'text-accent font-medium' : 'text-muted',
@@ -154,7 +160,7 @@ function isActive(href: string): boolean {
             </div>
           ) : (
             <a
-              href={item.href}
+              href={url(item.href)}
               class:list={[
                 'block py-3 text-[16px] font-medium transition-colors hover:text-accent',
                 isActive(item.href) ? 'text-accent' : 'text-ink',
