@@ -8,7 +8,14 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Teaching', href: '/teaching' },
+  {
+    label: 'Education',
+    href: '/teaching',
+    children: [
+      { label: 'Teaching', href: '/teaching' },
+      { label: 'Outreach', href: '/outreach' },
+    ],
+  },
   {
     label: 'Research',
     href: '/research',
